@@ -17,4 +17,15 @@ Built as a portfolio project to demonstrate backend fundamentals: authentication
 
 ## Getting Started
 
-🚧 Work in progress
+1. Clone the repository:
+
+```bash
+git clone https://github.com/noagsa/auth-api
+cd auth-api
+```
+2. Copy `application.properties.example` to `application.properties`.
+3. Set your JWT secret key (minimum 32 characters)
+4. Run the application:
+
+```bash
+./mvnw spring-boot:run
