@@ -1,7 +1,7 @@
 package io.github.noagsa.authapi.service;
 
-import io.github.noagsa.authapi.Exceptions.EmailAlreadyExistsException;
-import io.github.noagsa.authapi.Exceptions.InvalidCredentialsException;
+import io.github.noagsa.authapi.exception.EmailAlreadyExistsException;
+import io.github.noagsa.authapi.exception.InvalidCredentialsException;
 import io.github.noagsa.authapi.dto.AuthRequestDTO;
 import io.github.noagsa.authapi.dto.AuthResponseDTO;
 import io.github.noagsa.authapi.model.Role;
