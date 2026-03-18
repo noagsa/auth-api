@@ -1,4 +1,4 @@
-package io.github.noagsa.authapi.exceptions;
+package io.github.noagsa.authapi.exception;
 
 import org.springframework.http.HttpStatus;
 
