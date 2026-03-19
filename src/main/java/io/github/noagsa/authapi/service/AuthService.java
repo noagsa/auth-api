@@ -6,7 +6,9 @@ import io.github.noagsa.authapi.dto.AuthRequestDTO;
 import io.github.noagsa.authapi.dto.AuthResponseDTO;
 import io.github.noagsa.authapi.model.Role;
 import io.github.noagsa.authapi.model.User;
+import io.github.noagsa.authapi.repository.UserRepository;
 import io.github.noagsa.authapi.security.JwtService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,21 +16,29 @@ import java.util.Map;
 
 @Service
 public class AuthService {
+    private final UserRepository userRepository;
     private final JwtService jwtService;
-    private  Map<String, User> users;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(JwtService jwtService) {
+
+    public AuthService(UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
-        users = new HashMap<>();
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthResponseDTO register(AuthRequestDTO authRequestDTO) {
-        if (users.containsKey(authRequestDTO.email())) {
+        return register(authRequestDTO, Role.USER);
+    }
+
+    private AuthResponseDTO register(AuthRequestDTO authRequestDTO, Role role) {
+        if (userRepository.findByEmail(authRequestDTO.email()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
-        User user = new User(users.size() + 1, authRequestDTO.email(), authRequestDTO.password(), Role.USER);
-        users.put(user.getEmail(), user);
+        String encodedPassword = passwordEncoder.encode(authRequestDTO.password());
+        User user = new User(userRepository.countUsers() + 1, authRequestDTO.email(), encodedPassword, role);
+        userRepository.save(user);
 
         String token = jwtService.generateToken(user.getEmail());
 
@@ -36,11 +46,13 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO authRequest) {
-        if (!users.containsKey(authRequest.email())) {
+        if (userRepository.findByEmail(authRequest.email()).isEmpty()) {
             throw new InvalidCredentialsException("Email or password are wrong");
         }
 
-        if (!users.get(authRequest.email()).getPassword().equals(authRequest.password())) {
+        User user = userRepository.findByEmail(authRequest.email()).get();
+
+        if (!passwordEncoder.matches(authRequest.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Email or password are wrong");
         }
 
