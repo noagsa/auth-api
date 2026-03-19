@@ -1,1 +1,3 @@
 jwt.secret=your-secret-key-here-min-32-characters
+admin.mail=your-admin-mail
+admin.password=your-admin-password-here
